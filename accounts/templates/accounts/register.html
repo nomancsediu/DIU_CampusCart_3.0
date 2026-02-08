@@ -1,0 +1,52 @@
+<!-- templates/accounts/register.html -->
+{% extends "base.html" %}
+{% block title %}Register • CampusCart Lite{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+  <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+    <h1 class="text-2xl font-bold">Create account</h1>
+    <p class="text-sm text-slate-600 mt-1">Register to sell and manage your products.</p>
+
+    <form method="post" class="mt-6 space-y-4">
+      {% csrf_token %}
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Username</label>
+        <input name="username" type="text" required
+          value="{{ username|default:'' }}"
+          class="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Email</label>
+        <input name="email" type="email" required
+          value="{{ email|default:'' }}"
+          class="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Password</label>
+        <input name="password1" type="password" required
+          class="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Confirm Password</label>
+        <input name="password2" type="password" required
+          class="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+      </div>
+
+      <button type="submit"
+        class="w-full rounded-xl bg-slate-900 text-white py-2.5 font-medium hover:bg-slate-800">
+        Register
+      </button>
+    </form>
+
+    <p class="text-sm text-slate-600 mt-4 text-center">
+      Already have an account?
+      <a href="{% url 'login' %}" class="font-medium text-slate-900 underline">Login</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

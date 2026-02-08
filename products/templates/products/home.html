@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Home • CampusCart Lite{% endblock %}
+
+{% block content %}
+
+<div class="min-h-[60vh] flex items-center justify-center">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+
+    <!-- Sell Products Card -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition text-center">
+      <h2 class="text-2xl font-bold">Sell Products</h2>
+      <p class="text-slate-600 mt-3">
+        List your items and reach students easily.
+      </p>
+
+      {% if user.is_authenticated %}
+        <a href="{%url 'sell' %}"
+           class="inline-block mt-6 px-6 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
+          Start Selling
+        </a>
+      {% else %}
+        <a href="{% url 'login' %}"
+           class="inline-block mt-6 px-6 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
+          Login to Sell
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Buy Products Card -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition text-center">
+      <h2 class="text-2xl font-bold">Buy Products</h2>
+      <p class="text-slate-600 mt-3">
+        Browse products posted by other students.
+      </p>
+
+      <a href="{% url 'buy' %}"
+         class="inline-block mt-6 px-6 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
+        Explore Products
+      </a>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
