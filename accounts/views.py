@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 import random
 # Create your views here.
-#Register View--------------------------------------
+#Register View------------------------------------------------------------
 def _generate_otp():
     return str(random.randint(10000,99999))
 
@@ -58,7 +58,7 @@ def register_view(request):
 
         # send otp email
         send_mail(
-            subject="CampusCart Lite Verification Code",
+            subject="CampusCart Verification Code",
             message=f"Your verification code is: {otp}\nThis code expires in 10 minutes.",
             from_email=None,
             recipient_list=[email],
@@ -139,7 +139,7 @@ def resend_code_view(request):
 
 
 
-#Login View ---------------------------------
+#Login View --------------------------------------------------------------
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
