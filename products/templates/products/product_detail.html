@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ product.title }} • CampusCart Lite{% endblock %}
+
+{% block content %}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+  <!-- LEFT: IMAGE -->
+  <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+    {% if product.image %}
+      <img src="{{ product.image.url }}"
+           class="w-full h-[420px] object-cover rounded-xl">
+    {% else %}
+      <div class="w-full h-[420px] bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
+        No image available
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- RIGHT: DETAILS -->
+  <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+    <div class="flex items-start justify-between gap-3">
+      <h1 class="text-2xl font-bold">{{ product.title }}</h1>
+      <span class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700">
+        {{ product.get_condition_display }}
+      </span>
+    </div>
+
+    <p class="text-2xl font-bold mt-4">৳ {{ product.price }}</p>
+
+    <div class="mt-4 text-sm text-slate-600 space-y-2">
+      <p><span class="font-medium text-slate-800">Seller:</span> {{ product.seller.username }}</p>
+
+      <p>
+        <span class="font-medium text-slate-800">Category:</span>
+        {% if product.category %}
+          {{ product.category.name }}
+        {% else %}
+          None
+        {% endif %}
+      </p>
+
+      <p><span class="font-medium text-slate-800">Posted:</span> {{ product.created_at|date:"M d, Y" }}</p>
+
+      <p>
+        <span class="font-medium text-slate-800">Status:</span>
+        {% if product.is_available %}
+          Available
+        {% else %}
+          Sold
+        {% endif %}
+      </p>
+    </div>
+
+    <hr class="my-5 border-slate-200">
+
+    <h2 class="font-semibold mb-2">Description</h2>
+    <p class="text-slate-700 leading-relaxed whitespace-pre-line">
+      {{ product.description }}
+    </p>
+
+    <div class="mt-6 flex gap-3">
+      <a href="{% url 'buy' %}"
+         class="px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 transition">
+        Back to Buy
+      </a>
+
+      {% if user.is_authenticated and user != product.seller %}
+        <a href="#"
+           class="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
+          Contact Seller
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

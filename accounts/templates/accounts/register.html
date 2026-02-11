@@ -1,14 +1,48 @@
-<!-- templates/accounts/register.html -->
 {% extends "base.html" %}
+{% load socialaccount %}
 {% block title %}Register • CampusCart Lite{% endblock %}
 
 {% block content %}
 <div class="max-w-md mx-auto">
   <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-    <h1 class="text-2xl font-bold">Create account</h1>
-    <p class="text-sm text-slate-600 mt-1">Register to sell and manage your products.</p>
 
-    <form method="post" class="mt-6 space-y-4">
+    <h1 class="text-2xl font-bold">Create account</h1>
+    <p class="text-sm text-slate-600 mt-1">
+      Register to sell and manage your products.
+    </p>
+
+    <!-- 🔵 Google Register Button -->
+    <div class="mt-6">
+      <a href="{% provider_login_url 'google' %}"
+         class="w-full flex items-center justify-center gap-3 border border-slate-300 rounded-xl py-2.5 hover:bg-slate-50 transition">
+
+        <!-- Google Icon -->
+        <svg class="w-5 h-5" viewBox="0 0 48 48">
+          <path fill="#EA4335"
+            d="M24 9.5c3.54 0 6.7 1.22 9.2 3.61l6.87-6.87C35.82 2.41 30.38 0 24 0 14.64 0 6.63 5.38 2.69 13.24l8.14 6.32C12.64 13.35 17.82 9.5 24 9.5z"/>
+          <path fill="#4285F4"
+            d="M46.1 24.55c0-1.64-.14-3.22-.4-4.74H24v9h12.47c-.54 2.9-2.18 5.36-4.66 7.02l7.21 5.6C43.92 37.06 46.1 31.37 46.1 24.55z"/>
+          <path fill="#FBBC05"
+            d="M10.83 28.56a14.48 14.48 0 010-9.12l-8.14-6.32a24.02 24.02 0 000 21.76l8.14-6.32z"/>
+          <path fill="#34A853"
+            d="M24 48c6.48 0 11.93-2.14 15.9-5.82l-7.21-5.6c-2 1.35-4.56 2.14-8.69 2.14-6.18 0-11.36-3.85-13.17-9.06l-8.14 6.32C6.63 42.62 14.64 48 24 48z"/>
+        </svg>
+
+        <span class="font-medium text-slate-700">
+          Continue with Google
+        </span>
+      </a>
+    </div>
+
+    <!-- Divider -->
+    <div class="flex items-center my-6">
+      <div class="flex-1 border-t border-slate-200"></div>
+      <span class="px-3 text-xs text-slate-400">OR</span>
+      <div class="flex-1 border-t border-slate-200"></div>
+    </div>
+
+    <!-- Normal Register Form -->
+    <form method="post" class="space-y-4">
       {% csrf_token %}
 
       <div>
@@ -45,8 +79,11 @@
 
     <p class="text-sm text-slate-600 mt-4 text-center">
       Already have an account?
-      <a href="{% url 'login' %}" class="font-medium text-slate-900 underline">Login</a>
+      <a href="{% url 'login' %}" class="font-medium text-slate-900 underline">
+        Login
+      </a>
     </p>
+
   </div>
 </div>
 {% endblock %}

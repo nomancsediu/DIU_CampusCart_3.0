@@ -48,40 +48,49 @@
 <!-- ================= PRODUCT GRID ================= -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-  {% for product in page_obj %}
-    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+ {% for product in page_obj %}
+  <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
 
-      {% if product.image %}
+    {% if product.image %}
+      <a href="{% url 'product_detail' product.id %}">
         <img src="{{ product.image.url }}"
-             class="h-40 w-full object-cover rounded-xl mb-3">
-      {% else %}
-        <div class="h-40 bg-slate-100 rounded-xl mb-3"></div>
-      {% endif %}
+             class="h-40 w-full object-cover rounded-xl mb-3 hover:opacity-90 transition">
+      </a>
+    {% else %}
+      <div class="h-40 bg-slate-100 rounded-xl mb-3"></div>
+    {% endif %}
 
-      <h3 class="font-semibold text-lg">{{ product.title }}</h3>
+    <h3 class="font-semibold text-lg">
+      <a href="{% url 'product_detail' product.id %}" class="hover:underline">
+        {{ product.title }}
+      </a>
+    </h3>
 
-      <p class="text-slate-600 text-sm mt-1">
-        {{ product.description|truncatechars:80 }}
-      </p>
+    <p class="text-slate-600 text-sm mt-1">
+      {{ product.description|truncatechars:80 }}
+    </p>
 
-      <div class="mt-3 flex items-center justify-between">
-        <span class="font-bold text-lg">৳ {{ product.price }}</span>
-        <span class="text-xs px-2 py-1 rounded-full bg-slate-100">
-          {{ product.get_condition_display }}
-        </span>
-      </div>
-
-      <p class="text-xs text-slate-400 mt-2">
-        Seller: {{ product.seller.username }}
-      </p>
-
+    <div class="mt-3 flex items-center justify-between">
+      <span class="font-bold text-lg">৳ {{ product.price }}</span>
+      <span class="text-xs px-2 py-1 rounded-full bg-slate-100">
+        {{ product.get_condition_display }}
+      </span>
     </div>
 
-  {% empty %}
-    <p class="col-span-full text-center text-slate-500">
-      No products found.
+    <p class="text-xs text-slate-400 mt-2">
+      Seller: {{ product.seller.username }}
     </p>
-  {% endfor %}
+
+    <!-- 🔥 NEW BUTTON -->
+    <div class="mt-4">
+      <a href="{% url 'product_detail' product.id %}"
+         class="block w-full text-center bg-slate-900 text-white py-2 rounded-xl hover:bg-slate-800 transition">
+        View Details
+      </a>
+    </div>
+
+  </div>
+{% endfor %}
 
 </div>
 
