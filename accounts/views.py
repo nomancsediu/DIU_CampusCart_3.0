@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -6,6 +6,7 @@ from .models import PendingRegistration
 from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 import random
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 #Register View------------------------------------------------------------
 def _generate_otp():
@@ -163,6 +164,48 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+from .models import Profile
+from products.models import Product
+@login_required
+
+def user_profile_view(request):
+    # Get or create profile
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    
+    # Handle form submission - HTML form
+    if request.method == 'POST':
+        # Update profile with form data
+        profile.bio = request.POST.get('bio', '')
+        profile.phone = request.POST.get('phone', '')
+        profile.department = request.POST.get('department', '')
+        profile.batch = request.POST.get('batch', '')  
+        
+        # Handle profile photo upload
+        if 'profile_photo' in request.FILES:
+            profile.profile_photo = request.FILES['profile_photo']
+        
+        profile.save()
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('profile')
+    
+    # Product statistics
+    total = Product.objects.filter(seller=request.user).count()
+    available = Product.objects.filter(seller=request.user, is_available=True).count()
+    sold = Product.objects.filter(seller=request.user, is_available=False).count()
+    
+    context = {
+        "profile": profile,
+        "total": total,
+        "available": available,
+        "sold": sold,
+        "created": created,
+    }
+    
+    return render(request, "accounts/profile.html", context)
+
+
 
 
 

@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}CampusCart Lite{% endblock %}</title>
-
-  <!-- Tailwind CSS CDN -->
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -14,7 +14,7 @@
 
   <!-- ================= NAVBAR ================= -->
   <header class="bg-white border-b border-slate-200">
-    <nav class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+    <nav class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
       <!-- Left: Logo -->
       <a href="{% url 'home' %}" class="text-lg font-bold">
@@ -23,7 +23,21 @@
 
       <!-- Right: Menu -->
       <div class="flex items-center gap-3">
+
         {% if user.is_authenticated %}
+          <!-- Profile Picture / Initial -->
+          <a href="{% url 'profile' %}" class="flex items-center gap-2 group">
+            {% if user.profile.profile_photo %}
+              <img src="{{ user.profile.profile_photo.url }}" 
+                   class="w-8 h-8 rounded-full border border-slate-200 group-hover:ring-2 group-hover:ring-slate-900 transition"/>
+            {% else %}
+              <div class="w-8 h-8 rounded-full bg-slate-400 flex items-center justify-center text-white font-bold group-hover:ring-2 group-hover:ring-slate-900 transition">
+                {{ user.username|first|upper }}
+              </div>
+            {% endif %}
+          </a>
+
+          <!-- Logout -->
           <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
             <button type="submit"
@@ -31,19 +45,13 @@
               Logout
             </button>
           </form>
+
         {% else %}
-          <a href="{% url 'login' %}"
-             class="px-3 py-2 rounded-lg hover:bg-slate-100 transition">
-            Login
-          </a>
-
-          <a href="{% url 'register' %}"
-             class="px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition">
-            Register
-          </a>
+          <a href="{% url 'login' %}" class="px-3 py-2 rounded-lg hover:bg-slate-100 transition">Login</a>
+          <a href="{% url 'register' %}" class="px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition">Register</a>
         {% endif %}
-      </div>
 
+      </div>
     </nav>
   </header>
 
@@ -51,14 +59,11 @@
   {% if messages %}
     <div class="max-w-6xl mx-auto px-4 mt-4 space-y-2">
       {% for message in messages %}
-        <div class="rounded-xl px-4 py-3 border bg-white
-          {% if message.tags == 'error' %}
-            border-red-200 text-red-700
-          {% elif message.tags == 'success' %}
-            border-green-200 text-green-700
-          {% else %}
-            border-slate-200 text-slate-700
-          {% endif %}">
+        <div class="rounded-xl px-4 py-3 border bg-white shadow-sm
+          {% if message.tags == 'error' %} border-red-200 text-red-700 {% endif %}
+          {% if message.tags == 'success' %} border-green-200 text-green-700 {% endif %}
+          {% if message.tags == 'warning' %} border-yellow-200 text-yellow-700 {% endif %}
+        ">
           {{ message }}
         </div>
       {% endfor %}
@@ -71,7 +76,7 @@
   </main>
 
   <!-- ================= FOOTER ================= -->
-  <footer class="bg-white border-t border-slate-200">
+  <footer class="bg-white border-t border-slate-200 mt-auto">
     <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-500 text-center">
       © {% now "Y" %} CampusCart Lite
     </div>

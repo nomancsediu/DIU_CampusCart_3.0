@@ -15,6 +15,12 @@ def sell_view(request):
 
     categories = Category.objects.all()
 
+    profile = getattr(request.user,'profile', None)
+
+    if not profile or not(profile.department and profile.batch and profile.phone):
+        messages.error(request,"Please complete your profile before listing a product.")
+        return redirect("profile")
+
     if request.method=="POST":
         title = request.POST.get('title', '').strip()
         description = request.POST.get('description', '').strip()
