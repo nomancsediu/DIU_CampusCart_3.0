@@ -59,16 +59,16 @@
       {{ product.description }}
     </p>
 
-    <div class="mt-6 flex gap-3">
+    <div class="mt-6 flex gap-3 flex-wrap">
       <a href="{% url 'buy' %}"
          class="px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 transition">
         Back to Buy
       </a>
 
-      {% if user.is_authenticated and user != product.seller %}
-        <a href="#"
-           class="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
-          Contact Seller
+      {% if user.is_authenticated and product.seller != user %}
+        <a href="{% url 'start_chat' product.id %}"
+           class="inline-block px-5 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
+          Message Seller
         </a>
       {% endif %}
     </div>

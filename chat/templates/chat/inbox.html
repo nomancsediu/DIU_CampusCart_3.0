@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Inbox • CampusCart Lite{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <h1 class="text-2xl font-bold mb-4">Inbox</h1>
+
+  <div class="bg-white border border-slate-200 rounded-2xl divide-y">
+    {% for c in conversations %}
+      <a href="{% url 'chat_room' c.id %}" class="block p-4 hover:bg-slate-50">
+        <p class="font-medium">{{ c.product.title }}</p>
+        <p class="text-sm text-slate-600">
+          {% if request.user == c.buyer %}Seller: {{ c.seller.username }}{% else %}Buyer: {{ c.buyer.username }}{% endif %}
+        </p>
+      </a>
+    {% empty %}
+      <p class="p-4 text-slate-500">No conversations yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

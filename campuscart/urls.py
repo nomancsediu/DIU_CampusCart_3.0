@@ -9,4 +9,5 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('', include('products.urls')),
     path("accounts/", include("allauth.urls")),
+    path("", include("chat.urls")),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
