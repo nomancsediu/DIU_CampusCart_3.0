@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Product, Category
+from .models import Product, Category, ProductImage
 from django.core.paginator import Paginator
 
 
@@ -27,7 +27,7 @@ def sell_view(request):
         price = request.POST.get('price')
         condition = request.POST.get('condition')
         category_id = request.POST.get('category')
-        image = request.FILES.get('image')
+        images = request.FILES.getlist('images')
 
         if not title or not description or not price:
             messages.error(request, "All required fields must be filled.")
@@ -38,15 +38,23 @@ def sell_view(request):
         if category_id !='':
             category = Category.objects.get(id = category_id)
 
-        Product.objects.create(
+        product = Product.objects.create(
             seller=request.user,
             category=category,
             title=title,
             description=description,
             price=price,
-            condition=condition,
-            image=image
+            condition=condition
         )
+
+        # Save multiple images
+        for idx, image in enumerate(images):
+            ProductImage.objects.create(
+                product=product,
+                image=image,
+                order=idx
+            )
+
         messages.success(request, "Product listed successfully!")
         return redirect('sell')
 
@@ -162,3 +170,18 @@ def product_delete(request, pk):
         return redirect('my_products_view')
 
     return render(request, 'products/product_delete.html', {'product': product})
+
+@login_required
+def toggle_product_status(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    
+    if product.seller != request.user:
+        messages.error(request, "You are not allowed to modify this product.")
+        return redirect('buy')
+    
+    product.is_available = not product.is_available
+    product.save()
+    
+    status = "available" if product.is_available else "sold"
+    messages.success(request, f"Product marked as {status}!")
+    return redirect('my_products_view')

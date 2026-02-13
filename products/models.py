@@ -32,4 +32,23 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def first_image(self):
+        if self.images.exists():
+            return self.images.first().image
+        return self.image
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products/')
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+
+    def __str__(self):
+        return f"{self.product.title} - Image {self.order}"
         

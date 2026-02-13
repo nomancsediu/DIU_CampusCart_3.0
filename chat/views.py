@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from .models import Product
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -24,27 +23,25 @@ def start_chat(request,product_id):
     return redirect("chat_room", conversation_id = convo.id)
 
 @login_required
-
 def chat_room(request,conversation_id):
     convo = get_object_or_404(Conversation,id = conversation_id)
 
     if request.user not in[convo.buyer,convo.seller]:
         return redirect("home")
     
-    messages = Message.objects.filter(conversation=convo).order_by("created_at")
+    chat_messages = Message.objects.filter(conversation=convo).order_by("created_at")
 
     return render(request, "chat/room.html", {
         "conversation": convo,
-        "messages": messages
+        "messages": chat_messages
     })
 
 
 @login_required
-
 def inbox(request):
-    convos = Conversation.objects.filter(
-        Q(buyer=request.user) | Q(seller=request.user)).order_by("-created_at")
+    conversations = Conversation.objects.filter(
+        Q(buyer=request.user) | Q(seller=request.user)
+    ).order_by("-updated_at")  # শুধুমাত্র updated_at ব্যবহার করো
     
-    return render(request,"chat/inbox.html", {"conversations":convos})
-
+    return render(request, "chat/inbox.html", {"conversations": conversations})
     

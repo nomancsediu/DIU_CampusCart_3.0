@@ -1,59 +1,56 @@
 {% extends "base.html" %}
-{% block title %}Home • CampusCart Lite{% endblock %}
+{% block title %}Home - DIU CampusCart{% endblock %}
 
 {% block content %}
 
-<div class="min-h-[60vh] flex items-center justify-center">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+<div class="min-h-[60vh] flex items-center justify-center px-4">
+  <div class="w-full max-w-5xl">
+    
+    <!-- Welcome Section -->
+    <div class="text-center mb-8 sm:mb-12">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Welcome to DIU CampusCart</h1>
+      <p class="text-sm sm:text-base text-gray-600">Buy and sell products within the DIU community</p>
+    </div>
 
-    <!-- Sell Products Card -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition text-center">
-      <h2 class="text-2xl font-bold">Sell Products</h2>
-      <p class="text-slate-600 mt-3">
-        List your items and reach students easily.
-      </p>
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
 
+      <!-- Sell Products Card -->
+      <div class="bg-white border border-gray-200 rounded-lg p-6 shadow hover:shadow-lg transition">
+        <h2 class="text-xl font-bold text-gray-900 mb-2">Sell Products</h2>
+        <p class="text-sm text-gray-600 mb-6">List your items and reach students easily</p>
+        {% if user.is_authenticated %}
+          <a href="{% url 'sell' %}" class="block w-full text-center px-4 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 transition text-sm font-medium">
+            Start Selling
+          </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="block w-full text-center px-4 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 transition text-sm font-medium">
+            Login to Sell
+          </a>
+        {% endif %}
+      </div>
+
+      <!-- Buy Products Card -->
+      <div class="bg-white border border-gray-200 rounded-lg p-6 shadow hover:shadow-lg transition">
+        <h2 class="text-xl font-bold text-gray-900 mb-2">Buy Products</h2>
+        <p class="text-sm text-gray-600 mb-6">Browse products posted by other students</p>
+        <a href="{% url 'buy' %}" class="block w-full text-center px-4 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 transition text-sm font-medium">
+          Explore Products
+        </a>
+      </div>
+
+      <!-- My Products Card -->
       {% if user.is_authenticated %}
-        <a href="{% url 'sell' %}"
-           class="inline-block mt-6 px-6 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
-          Start Selling
+      <div class="bg-white border border-gray-200 rounded-lg p-6 shadow hover:shadow-lg transition">
+        <h2 class="text-xl font-bold text-gray-900 mb-2">My Products</h2>
+        <p class="text-sm text-gray-600 mb-6">Manage and track your listed items</p>
+        <a href="{% url 'my_products_view' %}" class="block w-full text-center px-4 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 transition text-sm font-medium">
+          View My Products
         </a>
-      {% else %}
-        <a href="{% url 'login' %}"
-           class="inline-block mt-6 px-6 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
-          Login to Sell
-        </a>
+      </div>
       {% endif %}
+
     </div>
-
-    <!-- Buy Products Card -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition text-center">
-      <h2 class="text-2xl font-bold">Buy Products</h2>
-      <p class="text-slate-600 mt-3">
-        Browse products posted by other students.
-      </p>
-
-      <a href="{% url 'buy' %}"
-         class="inline-block mt-6 px-6 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
-        Explore Products
-      </a>
-    </div>
-
-    <!-- My Products Card -->
-    {% if user.is_authenticated %}
-    <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition text-center">
-      <h2 class="text-2xl font-bold">My Products</h2>
-      <p class="text-slate-600 mt-3">
-        Manage and track your listed items.
-      </p>
-
-      <a href="{% url 'my_products_view' %}"
-         class="inline-block mt-6 px-6 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
-        View My Products
-      </a>
-    </div>
-    {% endif %}
-
   </div>
 </div>
 

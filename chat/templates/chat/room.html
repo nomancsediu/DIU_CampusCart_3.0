@@ -1,95 +1,115 @@
 {% extends "base.html" %}
-{% block title %}Chat • CampusCart Lite{% endblock %}
+{% block title %}Chat - {{ conversation.product.title }} - DIU CampusCart{% endblock %}
+
+{% block django_messages %}{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
-
-  <div class="bg-white border border-slate-200 rounded-2xl p-5">
-    <h1 class="text-xl font-bold">Chat</h1>
-    <p class="text-sm text-slate-600">
-      Product: {{ conversation.product.title }}
-    </p>
-  </div>
-
-  <div id="chatBox" class="mt-4 bg-white border border-slate-200 rounded-2xl p-4 h-[60vh] overflow-y-auto space-y-3">
-    {% for m in messages %}
-      <div class="{% if m.sender == request.user %}text-right{% endif %}">
-        <div class="inline-block max-w-[80%] rounded-2xl px-4 py-2
-          {% if m.sender == request.user %}bg-slate-900 text-white{% else %}bg-slate-100{% endif %}">
-          <p class="text-sm">{{ m.content }}</p>
-          <p class="text-[11px] opacity-70 mt-1">
-            {{ m.sender.username }} • {{ m.created_at|date:"Y-m-d H:i" }}
-          </p>
+<div class="max-w-3xl mx-auto h-[calc(100vh-10rem)] sm:h-[calc(100vh-12rem)] flex flex-col">
+    
+    <!-- Chat Header -->
+    <div class="bg-white border border-gray-200 rounded-t-lg p-2 sm:p-3 flex items-center gap-2 sm:gap-3">
+        <a href="{% url 'inbox' %}" class="p-1.5 sm:p-2 hover:bg-gray-100 rounded">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </a>
+        
+        {% if conversation.product.image %}
+        <img src="{{ conversation.product.image.url }}" class="w-8 h-8 sm:w-9 sm:h-9 rounded object-cover" />
+        {% else %}
+        <div class="w-8 h-8 sm:w-9 sm:h-9 bg-gray-100 rounded flex items-center justify-center">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
         </div>
-      </div>
-    {% endfor %}
-  </div>
+        {% endif %}
+        
+        <div class="flex-1 min-w-0">
+            <h2 class="font-bold text-gray-900 truncate text-xs sm:text-sm">{{ conversation.product.title }}</h2>
+            <p class="text-[10px] sm:text-xs text-gray-500">
+                {% if request.user == conversation.buyer %}
+                    {{ conversation.seller.get_full_name|default:conversation.seller.username }}
+                {% else %}
+                    {{ conversation.buyer.get_full_name|default:conversation.buyer.username }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
 
-  <form id="chatForm" class="mt-4 flex gap-2">
-    {% csrf_token %}
-    <input id="messageInput" type="text" placeholder="Type a message..."
-      class="flex-1 rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900" />
-    <button class="rounded-xl bg-slate-900 text-white px-5 py-2 hover:bg-slate-800">
-      Send
-    </button>
-  </form>
+    <!-- Message Area -->
+    <div id="chatBox" class="flex-1 bg-gray-50 border-x border-gray-200 overflow-y-auto p-2 sm:p-3 space-y-2">
+        {% for m in messages %}
+        <div class="flex {% if m.sender == request.user %}justify-end{% else %}justify-start{% endif %}">
+            <div class="max-w-[80%] sm:max-w-[70%] px-2.5 sm:px-3 py-2 rounded-lg text-xs sm:text-sm
+                {% if m.sender == request.user %}bg-gray-900 text-white{% else %}bg-white border border-gray-200 text-gray-900{% endif %}">
+                <p class="break-words">{{ m.content }}</p>
+                <p class="text-[9px] sm:text-[10px] opacity-60 mt-1 {% if m.sender == request.user %}text-right{% endif %}">
+                    {{ m.created_at|date:"g:i A" }}
+                </p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="flex items-center justify-center h-full">
+            <p class="text-gray-500 text-xs sm:text-sm">No messages yet. Start the conversation!</p>
+        </div>
+        {% endfor %}
+    </div>
 
+    <!-- Input Form -->
+    <div class="bg-white border border-gray-200 rounded-b-lg p-2 sm:p-3">
+        <form id="chatForm" class="flex gap-2">
+            <input id="messageInput" type="text" autocomplete="off" placeholder="Type a message..."
+                class="flex-1 bg-gray-50 border border-gray-300 rounded px-2.5 sm:px-3 py-1.5 sm:py-2 focus:outline-none focus:ring-2 focus:ring-gray-900 text-xs sm:text-sm" />
+            <button type="submit" class="bg-gray-900 text-white px-2.5 sm:px-3 py-1.5 sm:py-2 rounded hover:bg-gray-800">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 transform rotate-90" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  const conversationId = "{{ conversation.id }}";
-  const myUserId = "{{ request.user.id }}";
+    const convoId = "{{ conversation.id }}";
+    const myId = "{{ request.user.id }}";
+    const chatBox = document.getElementById("chatBox");
+    const chatForm = document.getElementById("chatForm");
+    const msgInput = document.getElementById("messageInput");
 
-  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-  const socket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${conversationId}/`);
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const socket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${convoId}/`);
 
-  const chatBox = document.getElementById("chatBox");
-  const form = document.getElementById("chatForm");
-  const input = document.getElementById("messageInput");
+    const scrollToBottom = () => { 
+        chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+    };
+    scrollToBottom();
 
-  function scrollBottom() {
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-  scrollBottom();
+    let lastSender = null;
 
-  socket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const isMe = String(data.sender_id) === String(myId);
+        const time = data.created_at || new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-    if (!data.message) return;
+        const msgHtml = `
+            <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                <div class="max-w-[70%] px-3 py-2 rounded-lg text-sm ${isMe ? 'bg-gray-900 text-white' : 'bg-white border border-gray-200 text-gray-900'}">
+                    <p>${data.message}</p>
+                    <p class="text-[10px] opacity-60 mt-1 ${isMe ? 'text-right' : ''}">${time}</p>
+                </div>
+            </div>
+        `;
+        
+        chatBox.insertAdjacentHTML('beforeend', msgHtml);
+        lastSender = data.sender_id;
+        scrollToBottom();
+    };
 
-    const isMe = String(data.sender_id) === String(myUserId);
+    chatForm.onsubmit = function(e) {
+        e.preventDefault();
+        const msg = msgInput.value.trim();
+        if (msg) {
+            socket.send(JSON.stringify({ 'message': msg }));
+            msgInput.value = '';
+        }
+    };
 
-    const wrapper = document.createElement("div");
-    wrapper.className = isMe ? "text-right" : "";
-
-    const bubble = document.createElement("div");
-    bubble.className = "inline-block max-w-[80%] rounded-2xl px-4 py-2 " + (isMe ? "bg-slate-900 text-white" : "bg-slate-100");
-
-    bubble.innerHTML = `
-      <p class="text-sm">${escapeHtml(data.message)}</p>
-      <p class="text-[11px] opacity-70 mt-1">${data.sender} • ${data.created_at}</p>
-    `;
-
-    wrapper.appendChild(bubble);
-    chatBox.appendChild(wrapper);
-    scrollBottom();
-  };
-
-  form.addEventListener("submit", function(ev) {
-    ev.preventDefault();
-    const message = input.value.trim();
-    if (!message) return;
-
-    socket.send(JSON.stringify({ message }));
-    input.value = "";
-  });
-
-  function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.innerText = text;
-    return div.innerHTML;
-  }
+    msgInput.focus();
 </script>
 {% endblock %}

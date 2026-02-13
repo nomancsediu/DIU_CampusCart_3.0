@@ -1,21 +1,48 @@
 {% extends "base.html" %}
-{% block title %}Inbox • CampusCart Lite{% endblock %}
+{% block title %}Messages - DIU CampusCart{% endblock %}
+
+{% block django_messages %}{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
-  <h1 class="text-2xl font-bold mb-4">Inbox</h1>
+    <div class="mb-4 sm:mb-6">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-2">Messages</h1>
+        <p class="text-sm sm:text-base text-gray-600">{{ conversations|length }} conversation{{ conversations|length|pluralize }}</p>
+    </div>
 
-  <div class="bg-white border border-slate-200 rounded-2xl divide-y">
-    {% for c in conversations %}
-      <a href="{% url 'chat_room' c.id %}" class="block p-4 hover:bg-slate-50">
-        <p class="font-medium">{{ c.product.title }}</p>
-        <p class="text-sm text-slate-600">
-          {% if request.user == c.buyer %}Seller: {{ c.seller.username }}{% else %}Buyer: {{ c.buyer.username }}{% endif %}
-        </p>
-      </a>
-    {% empty %}
-      <p class="p-4 text-slate-500">No conversations yet.</p>
-    {% endfor %}
-  </div>
+    <div class="bg-white border border-gray-200 rounded-lg shadow overflow-hidden">
+        {% for convo in conversations %}
+        <a href="{% url 'chat_room' convo.id %}" class="block border-b border-gray-100 last:border-0 hover:bg-gray-50 p-3 sm:p-4">
+            <div class="flex items-center gap-3">
+                {% if convo.product.image %}
+                <img src="{{ convo.product.image.url }}" class="w-12 h-12 sm:w-14 sm:h-14 rounded object-cover flex-shrink-0" />
+                {% else %}
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                </div>
+                {% endif %}
+
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start gap-2 mb-0.5">
+                        <h3 class="font-semibold text-gray-900 truncate text-sm sm:text-base">{{ convo.product.title }}</h3>
+                        <span class="text-xs text-gray-500 whitespace-nowrap">{{ convo.updated_at|timesince }}</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-600 truncate">
+                        {% if request.user == convo.buyer %}
+                            {{ convo.seller.get_full_name|default:convo.seller.username }}
+                        {% else %}
+                            {{ convo.buyer.get_full_name|default:convo.buyer.username }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="p-8 sm:p-12 text-center">
+            <p class="text-gray-500 mb-4 text-sm sm:text-base">No conversations yet</p>
+            <a href="{% url 'buy' %}" class="inline-block px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 text-sm">Browse Products</a>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

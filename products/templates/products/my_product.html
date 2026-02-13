@@ -11,7 +11,10 @@
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-lg transition p-4 flex flex-col">
 
       <!-- Product Image -->
-      {% if product.image %}
+      {% if product.images.exists %}
+        <img src="{{ product.images.first.image.url }}" 
+             class="h-48 w-full object-cover rounded-xl mb-3">
+      {% elif product.image %}
         <img src="{{ product.image.url }}" 
              class="h-48 w-full object-cover rounded-xl mb-3">
       {% else %}
@@ -41,16 +44,27 @@
 
       <!-- Buttons -->
       <div class="mt-4 flex gap-2">
-
         <a href="{% url 'product_edit' product.id %}" 
-           class="flex-1 text-center px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 transition">
+           class="flex-1 text-center px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50 transition text-sm">
           Edit
         </a>
 
-        <a href="{% url 'product_delete' product.id %}" 
-           class="flex-1 text-center px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition">
+        {% if product.is_available %}
+          <button onclick="confirmToggle({{ product.id }}, 'sold')" 
+             class="flex-1 px-3 py-2 rounded bg-orange-600 text-white hover:bg-orange-700 transition text-sm">
+            Mark Sold
+          </button>
+        {% else %}
+          <button onclick="confirmToggle({{ product.id }}, 'available')" 
+             class="flex-1 px-3 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition text-sm">
+            Mark Available
+          </button>
+        {% endif %}
+
+        <button onclick="confirmDelete({{ product.id }})" 
+           class="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition text-sm">
           Delete
-        </a>
+        </button>
       </div>
 
     </div>
@@ -62,5 +76,53 @@
   {% endfor %}
 
 </div>
+
+<script>
+function confirmToggle(productId, status) {
+  const title = status === 'sold' ? 'Mark as Sold?' : 'Mark as Available?';
+  const text = status === 'sold' ? 'This will mark the product as sold.' : 'This will mark the product as available.';
+  
+  Swal.fire({
+    title: title,
+    text: text,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: status === 'sold' ? '#ea580c' : '#16a34a',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = `/product/${productId}/toggle-status/`;
+    }
+  });
+}
+
+function confirmDelete(productId) {
+  Swal.fire({
+    title: 'Delete Product?',
+    text: 'This action cannot be undone!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `/product/${productId}/delete/`;
+      const csrf = document.createElement('input');
+      csrf.type = 'hidden';
+      csrf.name = 'csrfmiddlewaretoken';
+      csrf.value = '{{ csrf_token }}';
+      form.appendChild(csrf);
+      document.body.appendChild(form);
+      form.submit();
+    }
+  });
+}
+</script>
 
 {% endblock %}

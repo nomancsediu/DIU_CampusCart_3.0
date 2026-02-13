@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 
 class PendingRegistration(models.Model):
     username = models.CharField(max_length = 150)
+    full_name = models.CharField(max_length = 255, blank=True)
     email = models.EmailField(unique = True)
     password_hash = models.CharField(max_length = 128)
 

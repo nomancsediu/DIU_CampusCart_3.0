@@ -4,90 +4,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}CampusCart Lite{% endblock %}</title>
-  
-  <!-- Tailwind CSS -->
+  <title>{% block title %}DIU CampusCart{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    @keyframes slide-in {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .animate-slide-in {
+      animation: slide-in 0.3s ease-out;
+    }
+  </style>
 </head>
 
-<body class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
+<body class="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
 
-  <!-- ================= NAVBAR ================= -->
-  <header class="bg-white border-b border-slate-200">
-    <nav class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+  <!-- Navbar -->
+  <header class="bg-white border-b border-gray-200">
+    <nav class="w-full px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+      <a href="{% url 'home' %}" class="text-lg sm:text-xl font-bold text-gray-900">DIU CampusCart</a>
 
-      <!-- Left: Logo -->
-      <a href="{% url 'home' %}" class="text-lg font-bold">
-        CampusCart <span class="text-slate-500">Lite</span>
-      </a>
-
-      <!-- Right: Menu -->
-      <div class="flex items-center gap-3">
-        
-
-
+      <!-- Desktop Menu -->
+      <div class="hidden sm:flex items-center gap-3">
         {% if user.is_authenticated %}
-        <a href="{% url 'inbox' %}"
-   class="px-3 py-2 rounded-lg hover:bg-slate-100 transition">
-  Inbox
-</a>
-
-          <!-- Profile Picture / Initial -->
-          <a href="{% url 'profile' %}" class="flex items-center gap-2 group">
+          <a href="{% url 'inbox' %}" class="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 transition text-sm font-medium text-gray-900">Messages</a>
+          
+          <a href="{% url 'profile' %}" class="flex items-center gap-2 hover:opacity-80 transition">
             {% if user.profile.profile_photo %}
-              <img src="{{ user.profile.profile_photo.url }}" 
-                   class="w-8 h-8 rounded-full border border-slate-200 group-hover:ring-2 group-hover:ring-slate-900 transition"/>
+              <img src="{{ user.profile.profile_photo.url }}" class="w-8 h-8 rounded-full object-cover border border-gray-200">
             {% else %}
-              <div class="w-8 h-8 rounded-full bg-slate-400 flex items-center justify-center text-white font-bold group-hover:ring-2 group-hover:ring-slate-900 transition">
+              <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-sm">
                 {{ user.username|first|upper }}
               </div>
             {% endif %}
           </a>
 
-          <!-- Logout -->
+          <form action="{% url 'logout' %}" method="post" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 font-medium text-sm">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}" class="text-gray-700 hover:text-gray-900 text-sm">Login</a>
+          <a href="{% url 'register' %}" class="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 text-sm">Register</a>
+        {% endif %}
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button onclick="toggleMenu()" class="sm:hidden p-2 rounded hover:bg-gray-100">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden sm:hidden border-t border-gray-200 bg-white">
+      <div class="px-4 py-3 space-y-2 text-center">
+        {% if user.is_authenticated %}
+          <a href="{% url 'inbox' %}" class="block px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-gray-700">Messages</a>
+          <a href="{% url 'profile' %}" class="block px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-gray-700">Profile</a>
           <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
-            <button type="submit"
-              class="px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition">
-              Logout
-            </button>
+            <button type="submit" class="w-full px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-gray-700">Logout</button>
           </form>
-
         {% else %}
-          <a href="{% url 'login' %}" class="px-3 py-2 rounded-lg hover:bg-slate-100 transition">Login</a>
-          <a href="{% url 'register' %}" class="px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition">Register</a>
+          <a href="{% url 'login' %}" class="block px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-gray-700">Login</a>
+          <a href="{% url 'register' %}" class="block px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-gray-700">Register</a>
         {% endif %}
-
       </div>
-    </nav>
+    </div>
   </header>
 
-  <!-- ================= MESSAGES ================= -->
+  <!-- Messages -->
+  {% block django_messages %}
   {% if messages %}
-    <div class="max-w-6xl mx-auto px-4 mt-4 space-y-2">
+    <div class="fixed top-20 right-4 z-50 space-y-2">
       {% for message in messages %}
-        <div class="rounded-xl px-4 py-3 border bg-white shadow-sm
-          {% if message.tags == 'error' %} border-red-200 text-red-700 {% endif %}
-          {% if message.tags == 'success' %} border-green-200 text-green-700 {% endif %}
-          {% if message.tags == 'warning' %} border-yellow-200 text-yellow-700 {% endif %}
-        ">
+        <div data-message class="p-4 rounded-lg shadow-lg border max-w-sm animate-slide-in
+          {% if message.tags == 'error' %} bg-red-50 border-red-200 text-red-800 {% endif %}
+          {% if message.tags == 'success' %} bg-green-50 border-green-200 text-green-800 {% endif %}
+          {% if message.tags == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-800 {% endif %}">
           {{ message }}
         </div>
       {% endfor %}
     </div>
   {% endif %}
+  {% endblock %}
 
-  <!-- ================= PAGE CONTENT ================= -->
-  <main class="flex-1 max-w-6xl mx-auto px-4 py-8">
-    {% block content %}{% endblock %}
+  <!-- Content -->
+  <main class="flex-1 w-full">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+      {% block content %}{% endblock %}
+    </div>
   </main>
 
-  <!-- ================= FOOTER ================= -->
-  <footer class="bg-white border-t border-slate-200 mt-auto">
-    <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-500 text-center">
-      © {% now "Y" %} CampusCart Lite
-    </div>
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-200 py-6 text-center text-sm text-gray-600">
+    <p>&copy; {% now "Y" %} DIU CampusCart</p>
+    <p class="text-xs mt-1">Developed by <a href="https://linkedin.com/in/nomanit" target="_blank" class="font-medium text-gray-900 hover:underline">Abdullah Al Noman</a></p>
   </footer>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    // Auto-hide Django messages after 3 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+      const messages = document.querySelectorAll('[data-message]');
+      messages.forEach(function(message) {
+        setTimeout(function() {
+          message.style.transition = 'opacity 0.5s';
+          message.style.opacity = '0';
+          setTimeout(function() {
+            message.remove();
+          }, 500);
+        }, 3000);
+      });
+    });
+  </script>
 
   {% block scripts %}{% endblock %}
 </body>

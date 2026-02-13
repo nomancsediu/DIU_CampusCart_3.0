@@ -18,22 +18,22 @@ def register_view(request):
         return redirect('home')
     
     if request.method=="POST":
-        username = request.POST.get('username', '').strip()
+        full_name = request.POST.get('full_name', '').strip()
         email = request.POST.get('email', '').strip()
         password1 = request.POST.get('password1', '').strip()
         password2 = request.POST.get('password2', '').strip()
 
-        if not username or not email or not password1 or not password2:
+        if not full_name or not email or not password1 or not password2:
             messages.error(request, "All fields are required.")
-            return render(request, "accounts/register.html", {"username": username, "email": email})
+            return render(request, "accounts/register.html", {"full_name": full_name, "email": email})
         
         if password1!=password2:
             messages.error(request, "Password do not match.")
             return render(request,'accounts/register.html')
         
+        username = email.split('@')[0]
         if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists.")
-            return render(request,'accounts/register.html')
+            username = f"{username}{random.randint(100,999)}"
         
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email already exists.")
@@ -46,18 +46,12 @@ def register_view(request):
             email = email,
             defaults = {
                 "username":username,
+                "full_name":full_name,
                 "password_hash": password_hash,
                 "otp_code":otp,
             },
         )
 
-        # user = User.objects.create_user(
-        #     username = username,
-        #     email=email,
-        #     password=password1
-        # )
-
-        # send otp email
         send_mail(
             subject="CampusCart Verification Code",
             message=f"Your verification code is: {otp}\nThis code expires in 10 minutes.",
@@ -69,7 +63,6 @@ def register_view(request):
         request.session["pending_email"] = email
         messages.success(request,"Verification code sent to your email.")
 
-        # login(request,user)
         return redirect('verify_email')
     
     return render(request,'accounts/register.html')
@@ -101,6 +94,12 @@ def verify_email_view(request):
             email=pending.email,
             password = pending.password_hash,
         )
+        
+        if hasattr(pending, 'full_name') and pending.full_name:
+            name_parts = pending.full_name.split(' ', 1)
+            user.first_name = name_parts[0]
+            user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+            user.save()
 
         pending.delete()
         request.session.pop("pending_email", None)
@@ -145,20 +144,23 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
     if request.method == "POST":
-        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '').strip()
 
-        user = authenticate(request,username = username, password = password)
+        try:
+            user_obj = User.objects.get(email=email)
+            user = authenticate(request, username=user_obj.username, password=password)
+        except User.DoesNotExist:
+            user = None
+        
         if user is None:
-            messages.error(request,"Invalid username or password.")
-            return render(request,'accounts/login.html', {'username':username})
+            messages.error(request, "Invalid email or password.")
+            return render(request, 'accounts/login.html', {'email': email})
         
-        else:
-            login(request,user)
-            return redirect('home')
-        
+        login(request, user)
+        return redirect('home')
 
-    return render(request,'accounts/login.html')
+    return render(request, 'accounts/login.html')
 
 
 def logout_view(request):
@@ -176,6 +178,14 @@ def user_profile_view(request):
     
     # Handle form submission - HTML form
     if request.method == 'POST':
+        # Update user full name
+        full_name = request.POST.get('full_name', '').strip()
+        if full_name:
+            name_parts = full_name.split(' ', 1)
+            request.user.first_name = name_parts[0]
+            request.user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+            request.user.save()
+        
         # Update profile with form data
         profile.bio = request.POST.get('bio', '')
         profile.phone = request.POST.get('phone', '')

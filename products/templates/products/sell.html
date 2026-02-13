@@ -1,97 +1,68 @@
 {% extends "base.html" %}
-{% block title %}Sell Product • CampusCart Lite{% endblock %}
+{% block title %}Sell Product - DIU CampusCart{% endblock %}
 
 {% block content %}
 
 <div class="max-w-2xl mx-auto">
+  <div class="bg-white border border-gray-200 rounded-lg p-6 shadow">
 
-  <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+    <h1 class="text-3xl font-bold mb-2">Sell a Product</h1>
+    <p class="text-gray-600 mb-6">Fill in the details to list your product</p>
 
-    <!-- Heading -->
-    <h1 class="text-2xl font-bold mb-2">Sell a Product</h1>
-    <p class="text-slate-600 mb-6">
-      Fill in the details to list your product.
-    </p>
-
-    <!-- Form -->
-    <form method="post" enctype="multipart/form-data" class="space-y-5">
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
       {% csrf_token %}
 
-      <!-- Title -->
       <div>
-        <label class="block text-sm font-medium mb-1">Product Title</label>
-        <input type="text"
-               name="title"
-               required
-               class="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Product Title *</label>
+        <input type="text" name="title" required placeholder="e.g., iPhone 13 Pro Max"
+               class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
       </div>
 
-      <!-- Price -->
-      <div>
-        <label class="block text-sm font-medium mb-1">Price</label>
-        <input type="number"
-               name="price"
-               required
-               class="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Price (৳) *</label>
+          <input type="number" name="price" required placeholder="5000" step="0.01"
+                 class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Condition *</label>
+          <select name="condition" class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
+            <option value="NEW">New</option>
+            <option value="USED" selected>Used</option>
+          </select>
+        </div>
       </div>
 
-      <!-- Category -->
       <div>
-        <label class="block text-sm font-medium mb-1">Category</label>
-        <select name="category"
-                class="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
-
+        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+        <select name="category" class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900">
           <option value="">Select Category</option>
-
           {% for category in categories %}
-            <option value="{{ category.id }}">
-              {{ category.name }}
-            </option>
+            <option value="{{ category.id }}">{{ category.name }}</option>
           {% endfor %}
-
         </select>
       </div>
 
-      <!-- Condition -->
       <div>
-        <label class="block text-sm font-medium mb-1">Condition</label>
-        <select name="condition"
-                class="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900">
-          <option value="NEW">New</option>
-          <option value="USED">Used</option>
-        </select>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+        <textarea name="description" rows="4" required placeholder="Describe your product..."
+                  class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"></textarea>
       </div>
 
-      <!-- Description -->
       <div>
-        <label class="block text-sm font-medium mb-1">Description</label>
-        <textarea name="description"
-                  rows="4"
-                  required
-                  class="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900"></textarea>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Product Images</label>
+        <input type="file" name="images" accept="image/*" multiple
+               class="w-full rounded border border-gray-300 px-3 py-2 text-sm bg-white file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-gray-900 file:text-white hover:file:bg-gray-800">
+        <p class="text-xs text-gray-500 mt-1">You can select multiple images (first image will be the main photo)</p>
       </div>
 
-      <!-- Image Upload -->
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          Product Image (Optional)
-        </label>
-        <input type="file"
-               name="image"
-               accept="image/*"
-               class="w-full rounded-xl border border-slate-300 px-3 py-2 bg-white">
-      </div>
-
-      <!-- Submit Button -->
-      <button type="submit"
-              class="w-full bg-slate-900 text-white py-3 rounded-xl hover:bg-slate-800 transition">
+      <button type="submit" class="w-full py-2.5 bg-gray-900 text-white rounded hover:bg-gray-800 font-medium">
         Publish Product
       </button>
 
     </form>
 
   </div>
-
 </div>
 
 {% endblock %}
