@@ -180,9 +180,7 @@ campuscart/
 
 ---
 
-# 👨‍💻 Developed By
-
-## Abdullah Al Noman
+# 👨‍💻 Developed By Abdullah Al Noman
 
 CSE Student
 Aspiring Software Engineer
