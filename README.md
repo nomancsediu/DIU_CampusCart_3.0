@@ -182,10 +182,12 @@ campuscart/
 
 # 👨‍💻 Developed By Abdullah Al Noman
 
+```
 CSE Student
 Aspiring Software Engineer
 Focused on Backend Systems, Real-Time Architecture & Clean Code Design
 
+```
 ---
 
 <div align="center">
