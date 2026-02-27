@@ -41,7 +41,7 @@ def chat_room(request,conversation_id):
 def inbox(request):
     conversations = Conversation.objects.filter(
         Q(buyer=request.user) | Q(seller=request.user)
-    ).order_by("-updated_at")  # শুধুমাত্র updated_at ব্যবহার করো
+    ).order_by("-updated_at")
     
     return render(request, "chat/inbox.html", {"conversations": conversations})
     
